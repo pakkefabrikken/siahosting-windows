@@ -60,7 +60,8 @@ $response0 | ConvertTo-Json
 
 $resp0obj = $response0.monitors | where { $_.id -eq "xxx" }
 
-if($resp0obj.status -ne 2){
+if($resp0obj -ne $null -and $resp0obj.status -ne 2){
+    Write-Host 'Trigger ResetHost'
     ResetHost;
 }
 else{
@@ -71,16 +72,20 @@ else{
     Write-Host ' '
     Write-Host ' '
 
-    if($response.report.connected -eq $false -Or  $response.type -ne 'success' -Or $response.report.errors -ne $null){
+    if($response -ne $null -and ($response.report.connected -eq $false -Or  $response.type -ne 'success' -Or $response.report.errors -ne $null)){
         Write-Host 'Sleep 120sec'
         Start-Sleep -s 120
 
         $response2 = Invoke-RestMethod -URI $url -UseBasicParsing
         $response2 | ConvertTo-Json
 
-        if($response2.report.connected -eq $false -Or  $response2.type -ne 'success' -Or $response2.report.errors -ne $null){
+        if($response2 -ne $null -and ($response2.report.connected -eq $false -Or  $response2.type -ne 'success' -Or $response2.report.errors -ne $null)){
+            Write-Host 'Trigger ResetHost'
             ResetHost;
         }
+	    else{
+        	Write-Host 'Host running normal'
+    	}
     }
     else{
         Write-Host 'Host running normal'
