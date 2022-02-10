@@ -1,7 +1,7 @@
 # siahosting-windows
 Fix for sia hosting on windows
 
-replace xxx with your own values and save as powershell file
+replace xxx with your own values and save as powershell file, and run the script scheduled for repeat every 10 min.
 
 $url = 'https://api.siacentral.com/v2/troubleshoot/xxx';
 
