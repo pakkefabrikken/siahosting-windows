@@ -4,6 +4,7 @@ Fix for sia hosting on windows
 replace xxx with your own values
 
 $url = 'https://api.siacentral.com/v2/troubleshoot/xxx';
+
 $siaPath = 'C:\Users\xxx\AppData\Local\Programs\Sia-UI\Sia-UI.exe'
 
 function StopSia{
