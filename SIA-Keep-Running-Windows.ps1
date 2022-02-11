@@ -1,5 +1,6 @@
 ﻿#Clear-Host
  # Don't run this script if you plan on doing some heavy work like moving data between disks or something like that which can lock up your host.
+ # Schedule this script to run every 10 min or so
 
 [system.gc]::Collect()
 
