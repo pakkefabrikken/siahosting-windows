@@ -1,4 +1,5 @@
 ﻿#Clear-Host
+ # Don't run this script if you plan on doing some heavy work like moving data between disks or something like that which can lock up your host.
 
 [system.gc]::Collect()
 
