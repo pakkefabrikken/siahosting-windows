@@ -13,7 +13,19 @@ $siaHostPassword = 'xxx'
 $uptimerobotUrl = $null;
 #$uptimerobotUrl = 'https://api.uptimerobot.com/v2/getMonitors?api_key=xxx&monitors=xxx';
 #$uptimerobotMonitorId = 'xxx'
+$restartIfRamLessThanMB = 500
 
+$freeram = Get-CIMInstance Win32_OperatingSystem | Select FreePhysicalMemory
+if(($freeram.FreePhysicalMemory/1000) -lt $restartIfRamLessThanMB){
+    Write-Host 'Host not running normal, stopping host'
+    StopSia;
+    Write-Host 'Sleep 120sec to allow host to stop'
+    Start-Sleep -s 120
+    Restart-Computer -Force
+}else{
+    Write-Host 'Host has ram to continue'
+    Write-Host ' '
+}
 
 function StopSia{
     Write-Host 'Stopping sia host'
@@ -84,24 +96,28 @@ if($resetHost -eq $false){
     $response | ConvertTo-Json
 
     if($response -ne $null -and $response.report -ne $null -and ($response.report.connected -eq $false -Or  $response.type -ne 'success' -Or $response.report.errors -ne $null)){
-        Write-Host 'Sleep 120sec and retry as first call to siacentral.com shows there are issues with the host'
-        Start-Sleep -s 120
-
-        Write-Host "Calling siacentral.com 2. time"
-        $response2 = Invoke-RestMethod -URI $siacentralUrl -UseBasicParsing
-        $response2 | ConvertTo-Json
-
-        if($response2 -ne $null -and $response2.report -ne $null -and ($response2.report.connected -eq $false -Or  $response2.type -ne 'success' -Or $response2.report.errors -ne $null)){
-            Write-Host 'Trigger ResetHost, siacentral.com shows host is down or has issues'
-            ResetHost;
+        
+        if($response.report.errors -ne $null -and ($response.report.errors | Out-String).Contains("is not accepting")){
+            Write-Host 'Host running normal and Host is not accepting contracts'
         }
-	    else{
-        	Write-Host 'Host running normal again'
-		    [system.gc]::Collect()
-    	}
+        else{
+            Write-Host 'Sleep 300sec and retry as first call to siacentral.com shows there are issues with the host'
+            Start-Sleep -s 300
+
+            Write-Host "Calling siacentral.com 2. time"
+            $response2 = Invoke-RestMethod -URI $siacentralUrl -UseBasicParsing
+            $response2 | ConvertTo-Json
+
+            if($response2 -ne $null -and $response2.report -ne $null -and ($response2.report.connected -eq $false -Or  $response2.type -ne 'success' -Or $response2.report.errors -ne $null)){
+                Write-Host 'Trigger ResetHost, siacentral.com shows host is down or has issues'
+                ResetHost;
+            }
+	        else{
+        	    Write-Host 'Host running normal again'            
+    	    }
+        }
     }
     else{
         Write-Host 'Host running normal'
-	    [system.gc]::Collect()
     }
 }
