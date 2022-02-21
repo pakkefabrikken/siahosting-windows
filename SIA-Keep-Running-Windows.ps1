@@ -14,17 +14,7 @@ $uptimerobotUrl = $null;
 #$uptimerobotMonitorId = 'xxx'
 $restartIfRamLessThanMB = 500
 
-$freeram = Get-CIMInstance Win32_OperatingSystem | Select FreePhysicalMemory
-if(($freeram.FreePhysicalMemory/1000) -lt $restartIfRamLessThanMB){
-    Write-Host 'Host not running normal, stopping host'
-    StopSia;
-    Write-Host 'Sleep 120sec to allow host to stop'
-    Start-Sleep -s 120
-    Restart-Computer -Force
-}else{
-    Write-Host 'Host has ram to continue'
-    Write-Host ' '
-}
+
 
 function StopSia{
     Write-Host 'Stopping sia host'
@@ -71,6 +61,20 @@ function ResetHost{
     Write-Host 'Starting sia host'
     Start-Process -FilePath $siaPath
 }
+
+
+$freeram = Get-CIMInstance Win32_OperatingSystem | Select FreePhysicalMemory
+if(($freeram.FreePhysicalMemory/1000) -lt $restartIfRamLessThanMB){
+    Write-Host 'Host not running normal, stopping host'
+    StopSia;
+    Write-Host 'Sleep 120sec to allow host to stop'
+    Start-Sleep -s 120
+    Restart-Computer -Force
+}else{
+    Write-Host 'Host has ram to continue'
+    Write-Host ' '
+}
+
 
 $resetHost = $false;
 
